@@ -1,0 +1,740 @@
+<%@ page import="java.sql.*"%>
+<HTML>
+<HEAD>
+<TITLE> New Document </TITLE>
+<META NAME="Generator" CONTENT="EditPlus">
+<META NAME="Author" CONTENT="">
+<META NAME="Keywords" CONTENT="">
+<META NAME="Description" CONTENT="">
+</HEAD>
+
+<BODY>
+ 
+<%
+ String id1=request.getParameter("id");
+  String ch=request.getParameter("ch");
+  //boolean bid=Boolean.parseBoolean(ch);
+//  int id=Integer.parseInt(id1);
+out.println(id1);
+//out.println(ch); 
+String saccno="";String id="";String did="";
+  String atype="";
+  String sbname="";int bal=0;String daccno="";int amt=0;String acname="";String dacname="";
+  String dtype="";
+  String dbname="";int dbal=0;
+  Class.forName("com.mysql.jdbc.Driver");
+Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+ 
+	 PreparedStatement st=con.prepareStatement("select * from transfer where id='"+id1+"'");
+ResultSet rs=st.executeQuery();
+while(rs.next())
+{
+dbname=rs.getString(9);
+	saccno=rs.getString(2);
+		atype=rs.getString(5);	dtype=rs.getString(6);
+		sbname=rs.getString(8);
+daccno=rs.getString(3);
+amt=rs.getInt(4);
+}
+PreparedStatement st1=con.prepareStatement("select * from customer where bname=? and accno=? and atype=?");
+	   st1.setString(1,sbname);
+	   st1.setString(2,saccno);
+	   st1.setString(3,atype);
+ResultSet rs1=st1.executeQuery();
+while(rs1.next())
+{
+	id=rs1.getString(1);
+    acname=rs1.getString(6);
+	bal=rs1.getInt(8);
+}
+
+
+PreparedStatement st2=con.prepareStatement("select * from customer where bname=? and accno=? and atype=?");
+	   st2.setString(1,dbname);
+	   st2.setString(2,daccno);
+	   st2.setString(3,dtype);
+ResultSet rs2=st2.executeQuery();
+while(rs2.next())
+{
+	did=rs2.getString(1);
+    dacname=rs2.getString(6);
+	dbal=rs2.getInt(8);
+}
+bal=bal-amt;
+dbal=dbal+amt;
+
+	 PreparedStatement st6=con.prepareStatement("update customer set bal=? where id=? and accno=? and bname=?");
+ st6.setInt(1,bal);
+  st6.setString(2,id);
+   st6.setString(3,saccno);
+    st6.setString(4,sbname);
+	st6.executeUpdate();
+PreparedStatement st7=con.prepareStatement("update customer set bal=? where id=? and accno=? and bname=?");
+ st7.setInt(1,dbal);
+  st7.setString(2,did);
+   st7.setString(3,daccno);
+    st7.setString(4,dbname);
+	st7.executeUpdate();
+
+ PreparedStatement st8=con.prepareStatement("insert into taccept values(?,?,?,?,?,?,?,?,?,?)");
+ st8.setString(1,id);
+  st8.setString(2,saccno);
+   st8.setString(3,atype);
+    st8.setString(4,sbname);
+	  st8.setInt(5,bal);
+	 st8.setString(6,did);
+  st8.setString(7,daccno);
+   st8.setString(8,dtype);
+    st8.setString(9,dbname);
+st8.setInt(10,amt);
+int i=st8.executeUpdate();
+PreparedStatement st9=con.prepareStatement("delete from transfer where id=? ");
+ st9.setString(1,id1);
+ 
+int j=st9.executeUpdate();
+if(j>0)
+	%>
+ <center><BR><BR><BR>	<h2> Transaction is  Accepted</h2>
+ <BR><BR>
+ <input type="button" value="     back     " onclick="window.location='bmain.jsp'">  
+
+</BODY>
+</HTML>
+//String bname=(String)session.getAttribute("bn");
+int in=1; 
+if(ch.equalsIgnoreCase("true"))
+{ 
+	%>
+ <center><BR><BR><BR>	<h2>The Transaction for the customer ID<%=id%> has been Accepted</h2>
+ <BR><BR>
+ <input type="submit" value="     back     " onclick="2window.location='bmain.jsp'">  
+<%
+}
+		 
+else
+{	%>
+	 <center><BR><BR><BR>	<h2>The Transaction Password for the customer ID<%=id%> is Invalid </h2>
+	 <BR><BR>
+<input type="submit" value="     back     " onclick="2window.location='bmain.jsp'">  
+ 
+
+ <%}%>
+</BODY>
+</HTML>
+
+
+<BR><BR><BR><BR><BR><BR>
+<BR><BR><BR><center><h2>Bank admin request is Accepted</center><center><BR><BR><BR>
+<input type="button" name=back  value="   BACK   " onClick="window.location='pbreq.jsp'">
+<%@ page import ="java.sql.*" %>
+<%
+   
+   Class.forName("com.mysql.jdbc.Driver");
+   float bal=200;
+   int id=Integer.parseInt(request.getParameter("id"));
+     String bid="";
+	 String pwd="";
+	   String bname="";
+	   int status=1;String i="";int ind=0;
+   Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+PreparedStatement ps2=con.prepareStatement("select * from blogin where id=?");
+ ps2.setInt(1,id);
+ ResultSet rs3=ps2.executeQuery();
+ if(rs3.next()){
+bid=rs3.getString(2);
+pwd=rs3.getString(3);
+bname=rs3.getString(4);
+
+ }
+ PreparedStatement ps3=con.prepareStatement("select * from bank where bname=?");
+ ps3.setString(1,bname);ResultSet rs4=ps3.executeQuery();
+ if(rs4.next()){}else{	 PreparedStatement st1=con.prepareStatement("select max(id) from bank");
+ ResultSet rs5=st1.executeQuery();
+ if(rs5.next()){
+ i=rs5.getString(1);
+ if(i==null){ind=0;}else{ind=Integer.parseInt(i)+1;
+}
+ }
+	 PreparedStatement st=con.prepareStatement("insert into bank values(?,?)");
+  
+    st.setInt(1,ind);
+	    st.setString(2,bname);
+st.executeUpdate();
+ }
+
+
+PreparedStatement ps=con.prepareStatement("update blogin set bid=?,pwd=?,bname=?,status=? where id=?");
+    System.out.println("hi");
+	ps.setString(1,bid);
+	//ps.setString(2,psw);
+	ps.setString(2,pwd);
+ ps.setString(3,bname);
+ ps.setInt(4,status);
+ ps.setInt(5,id);
+	ps.executeUpdate();
+response.sendRedirect("acceptbsuccess.jsp");
+%>
+
+
+<BR><BR><BR><BR><BR><BR>
+<BR><BR><BR><center><h2>User Request is Accepted</center><center><BR><BR>
+<input type="button" name=back  value="   BACK   " onClick="window.location='pureq.jsp'">
+<%@ page import ="java.sql.*" %>
+<%
+   
+   Class.forName("com.mysql.jdbc.Driver");
+  
+   int id=Integer.parseInt(request.getParameter("id"));
+     String bid="";
+	 String pwd="";
+	 	   int status=1;
+   Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+PreparedStatement ps2=con.prepareStatement("select * from clogin where id=?");
+ ps2.setInt(1,id);
+ ResultSet rs3=ps2.executeQuery();
+ if(rs3.next()){
+bid=rs3.getString(2);
+pwd=rs3.getString(3);
+
+
+ }
+
+PreparedStatement ps=con.prepareStatement("update clogin set cid=?,pwd=?,status=? where id=?");
+    System.out.println("hi");
+	ps.setString(1,bid);
+
+	ps.setString(2,pwd);
+
+ ps.setInt(3,status);
+ ps.setInt(4,id);
+	ps.executeUpdate();
+response.sendRedirect("acceptsuccess.jsp");
+%>
+<BR><BR><BR><center><h3>Your account request is in process</h3>
+<input type="button" name=back  value="   OK   " onClick="window.location='user.jsp'">
+<HTML>
+<HEAD>
+<TITLE> </TITLE>
+</HEAD>
+<script >
+function call()
+{
+if(document.f.name.value==""){
+alert("Please Enter Name");
+document.f.name.setFocus=true;
+return false;
+}
+if(document.f.pwd.value==""){
+alert("Please Enter Ur Password");
+return false;
+}
+}
+</script>
+<BODY bgcolor=#FFFFFF>
+
+<center>
+<BR><BR>
+ 
+ <font size="+2" color="#FF5C0F"><h2><b>WELCOME TO E-TRANSACTION INTERFACE</b></h2></font>
+<br>
+ 
+
+
+
+<form  method=post action="admincheck.jsp" name="f" onSubmit='return call()'>
+ <table>
+ <tr>
+ <td><b>Name:</b></td><td><input type="text" name="name" ></td>
+</tr>
+<tr><td>&nbsp;</td></tr>
+<tr> 
+<td><b> Password:</b></td><td><input type="password" name="pwd"></td>
+</tr>
+</table>
+<br> <BR>
+ <input type="submit" value="submit"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ <input type="reset" value="reset">
+ 
+ </form>
+<br>
+
+</center>
+
+</BODY>
+</HTML>
+
+<%@ page import="java.sql.*" %>
+<%
+
+String name=request.getParameter("name");
+String pwd=(String)request.getParameter("pwd");
+ 	Class.forName("com.mysql.jdbc.Driver");
+	Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+	int ind=0;
+    
+if((name.equals("admin"))&&(pwd.equals("admin"))){
+ response.sendRedirect("adminhome.jsp");
+}else{response.sendRedirect("adminfailure.jsp");}
+
+
+	%>
+<BR>
+<center><h2>Invalid user name and password</h3> 
+<jsp:include page="admin.jsp"/>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> New Document </TITLE>
+<META NAME="Generator" CONTENT="EditPlus">
+<META NAME="Author" CONTENT="">
+<META NAME="Keywords" CONTENT="">
+<META NAME="Description" CONTENT="">
+</HEAD>
+
+<BODY>
+
+</BODY>
+</HTML>
+<BR><BR><BR><BR><BR><center>
+<table width="50%" align="center">
+<tr>
+<td><a href="pbreq.jsp"><h2>Pending Bankers Requests</a></td></tr><tr></tr><tr></tr>
+<tr><td><a href="pureq.jsp"><h2>Pending User Requests</a></td></tr><tr></tr><tr></tr>
+<tr><td><a href="home.jsp"><h2>Signout</a></td></tr><tr></tr><tr></tr>
+
+
+
+
+
+<BODY>
+<center><h3>Your  account request is  rejected </h3>
+  <center> <jsp:include page="user.jsp"/> 
+</BODY>
+</HTML>
+
+
+<BR><BR><BR><BR><BR><BR><BR><BR>
+<BR><BR><BR><center><h2>Your new account request is in process</center><center><BR><BR>
+<input type="button" name=back  value="   BACK   " onClick="window.location='userhome.jsp'">
+
+<%@ page import ="java.sql.*" %>
+<%
+   int i=0;int ii=0;
+   Class.forName("com.mysql.jdbc.Driver");
+   float bal=200;
+   Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+ PreparedStatement st1=con.prepareStatement("select MAX(id) from blogin");
+ ResultSet rs1=st1.executeQuery();
+ if(rs1.next()){
+	 String s=rs1.getString(1);
+	 if(s==null){
+	 i=1;}else{i=Integer.parseInt(s)+1;}
+ }
+   String bid=request.getParameter("id");
+
+  // String name=request.getParameter("name");
+   String pwd=request.getParameter("pwd");
+ //  String accno=request.getParameter("accno");
+     // String cid=request.getParameter("cid");
+//String bname=(String)session.getAttribute("bname");
+		       String bname=request.getParameter("bname");
+			   int ind=0;
+
+
+
+PreparedStatement ps2=con.prepareStatement("select * from bank where bname=?");
+ ps2.setString(1,bname);
+ ResultSet rs3=ps2.executeQuery();
+ if(rs3.next()){
+ }else{
+ PreparedStatement ps1=con.prepareStatement("select MAX(id) from bank");
+ ResultSet rs2=ps1.executeQuery();
+ if(rs2.next()){
+	 String s=rs2.getString(1);
+	 if(s==null){
+	 ii=1;}else{ii=Integer.parseInt(s)+1;}
+ }
+ 
+PreparedStatement st3=con.prepareStatement("insert into bank values(?,?)");
+  st3.setInt(1,ii);
+    st3.setString(2,bname);
+	    st3.executeUpdate();
+
+ }
+   PreparedStatement st=con.prepareStatement("insert into blogin values(?,?,?,?,?)");
+  st.setInt(1,i);
+    st.setString(2,bid);
+	    st.setString(3,pwd);
+		st.setString(4,bname);
+		st.setInt(5,ind);
+		st.executeUpdate();
+ response.sendRedirect("process.jsp");
+ 
+ %>
+<%@ page import ="java.sql.*" %>
+<%
+   
+   Class.forName("com.mysql.jdbc.Driver");
+   float bal=200;
+   Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+    String id=request.getParameter("id");
+  int ii=0;
+   String pwd=request.getParameter("pwd");
+   PreparedStatement ps3=con.prepareStatement("select *  from clogin where cid=? ");
+				ps3.setString(1,id);
+							
+ ResultSet rs3=ps3.executeQuery();
+// System.out.println("hiii");
+ if(rs3.next()){System.out.println("hiii22");
+ response.sendRedirect("exist.jsp");
+ }
+ else{
+      PreparedStatement ps1=con.prepareStatement("select MAX(id) from clogin");
+ ResultSet rs2=ps1.executeQuery();
+ if(rs2.next()){
+	 String s=rs2.getString(1);
+	 if(s==null){
+	 ii=1;}else{ii=Integer.parseInt(s)+1;}
+ }
+		      
+			   int ind=0;
+   PreparedStatement st=con.prepareStatement("insert into clogin values(?,?,?,?)");
+    st.setInt(1,ii);
+    st.setString(2,id);
+	    st.setString(3,pwd);
+		st.setInt(4,ind);
+		st.executeUpdate();
+ response.sendRedirect("process.jsp");
+ }
+ %>
+<%@ page import ="java.sql.*" %>
+<%
+   
+   Class.forName("com.mysql.jdbc.Driver");
+   float bal=200;
+   Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+    String id=request.getParameter("id");
+  int ii=0;
+   String pwd=request.getParameter("pwd");
+   PreparedStatement ps3=con.prepareStatement("select *  from clogin where cid=? ");
+				ps3.setString(1,id);
+							
+ ResultSet rs3=ps3.executeQuery();
+// System.out.println("hiii");
+ if(rs3.next()){System.out.println("hiii22");
+ response.sendRedirect("exist.jsp");
+ }
+ else{
+      PreparedStatement ps1=con.prepareStatement("select MAX(id) from clogin");
+ ResultSet rs2=ps1.executeQuery();
+ if(rs2.next()){
+	 String s=rs2.getString(1);
+	 if(s==null){
+	 ii=1;}else{ii=Integer.parseInt(s)+1;}
+ }
+		      
+			   int ind=0;
+   PreparedStatement st=con.prepareStatement("insert into clogin values(?,?,?,?)");
+    st.setInt(1,ii);
+    st.setString(2,id);
+	    st.setString(3,pwd);
+		st.setInt(4,ind);
+		st.executeUpdate();
+ response.sendRedirect("process.jsp");
+ }
+ %><%@ page import ="java.sql.*" %>
+<%
+   
+   Class.forName("com.mysql.jdbc.Driver");
+   float bal=200;
+   Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+    String id=request.getParameter("id");
+  int ii=0;
+   String pwd=request.getParameter("pwd");
+   PreparedStatement ps3=con.prepareStatement("select *  from clogin where cid=? ");
+				ps3.setString(1,id);
+							
+ ResultSet rs3=ps3.executeQuery();
+// System.out.println("hiii");
+ }
+ %>
+<%@ page import ="java.sql.*" %>
+<%
+   
+   Class.forName("com.mysql.jdbc.Driver");
+   float bal=200;
+   Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+    String id=request.getParameter("id");
+  int ii=0;
+   String pwd=request.getParameter("pwd");
+   PreparedStatement ps3=con.prepareStatement("select *  from clogin where cid=? ");
+				ps3.setString(1,id);
+							
+ ResultSet rs3=ps3.executeQuery();
+// System.out.println("hiii");
+ if(rs3.next()){System.out.println("hiii22");
+ response.sendRedirect("exist.jsp");
+ }
+ else{
+      PreparedStatement ps1=con.prepareStatement("select MAX(id) from clogin");
+ ResultSet rs2=ps1.executeQuery();
+ if(rs2.next()){
+	 String s=rs2.getString(1);
+	 if(s==null){
+	 ii=1;}else{ii=Integer.parseInt(s)+1;}
+ }
+		      
+			   int ind=0;
+   PreparedStatement st=con.prepareStatement("insert into clogin values(?,?,?,?)");
+    st.setInt(1,ii);
+    st.setString(2,id);
+	    st.setString(3,pwd);
+		st.setInt(4,ind);
+		st.executeUpdate();
+ response.sendRedirect("process.jsp");
+ }
+ %>
+
+<HTML>
+<HEAD>
+<TITLE></TITLE>
+ 
+</HEAD>
+<center>
+ <script>
+ function check(){
+ if(document.f1.accno.value==""){
+ alert("enter account number");
+ return false;
+ }
+
+ if(document.f1.name.value==""){
+ alert("enter account holder name");
+ return false;
+ }
+
+
+ if(document.f1.tpassword.value==""){
+	
+ alert("enter transaction password");
+ return false;
+ }
+ if(!((document.f1.tpassword.value)==(document.f1.tpassword1.value)))
+	{
+	 alert("enter correct transaction password");
+	 return false;
+	}
+
+ }
+
+</script>
+
+<BODY  ><BR>
+ <form action="insaccount.jsp" name="f1" method=get onsubmit='return check()'>
+ <h2><u>Enter Account Details</u></font></h2><B></B></b>
+ <table width="45%">
+<tr><td>
+<h3>Enter Account Number   </td><td>   <input type="text" name="accno"></td></tr><tr></tr><tr></tr>
+<tr><td><h3>Enter Account Holder Name </td><td> <input type="text" name="name"></td></tr><tr></tr>
+
+<tr><td><h3>Account Type</td><td><SELECT NAME="atype"> 
+                  <option  >Current Account</option>
+				  <option >Savings Account</option>
+				  <option >Others</option>
+
+  </SELECT></td></tr>
+  <tr><td>
+
+<h3>Enter Transaction Password	 </td><td>      	     <input type="password" name="tpassword"></td></tr><tr></tr><tr></tr>
+<tr><td><h3>Confirm Password</td>  <td><input type="password" name="tpassword1"></td></tr><br><tr></tr>
+     </table><BR>
+ <BR><BR>
+<input type=submit value =Submit>
+&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" name=back  value="   back   " onClick="window.location='userhome.jsp'">&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="reset"   value="   reset   " >
+  </font></b> </form>
+  </body>
+  </center>
+  </html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> New Document </TITLE>
+<META NAME="Generator" CONTENT="EditPlus">
+<META NAME="Author" CONTENT="">
+<META NAME="Keywords" CONTENT="">
+<META NAME="Description" CONTENT="">
+</HEAD>
+
+<BODY>
+<%
+out.println(request.getParameter("bname"));
+%>
+
+</BODY>
+</HTML>
+<%@ page import ="java.sql.*" %>
+<HTML>
+<HEAD>
+<TITLE> </TITLE>
+</HEAD>
+<script >
+function call()
+{
+
+}
+</script>
+<BODY bgcolor=#FFFFFF>
+
+<center>
+<BR><BR>
+ 
+ <font size="+2" color="#FF5C0F"><h2>E-Transaction Interface</b></h2></font>
+<br>
+ 
+
+
+
+<form  method=post action="usercheck.jsp" name="f" onSubmit='return call()'>
+ <table>
+ <tr>
+ <td>
+<tr><td><h3>Select Bank</td><td><SELECT NAME="bname"> 
+<%
+Class.forName("com.mysql.jdbc.Driver");
+	  Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+	   PreparedStatement st=con.prepareStatement("select * from bank ");
+	
+	ResultSet rs=st.executeQuery();
+	while(rs.next()){
+
+%>
+
+
+                  <option  ><%=rs.getString(2)%></option>
+				  
+<%}%>
+  </SELECT></td></tr>
+</table>
+<br> <BR>
+ <input type="submit" value="submit"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" name=back  value="back " onClick="window.location='login.jsp'">&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" name=back  value="Home " onClick="window.location='home.jsp'">
+
+ </form>
+<center><a href="otherbanknewac.jsp"><h2>New User &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Account</h2> </a>
+
+<br><center><BR><BR>
+
+</center>
+
+</BODY>
+</HTML>
+
+<%@ page import="java.sql.*" %>
+<%
+String id=(String)session.getAttribute("id");
+System.out.println(id);
+int id1=Integer.parseInt(id);
+String cid=request.getParameter("cid");
+String pwd=(String)request.getParameter("pwd");
+String bname=(String)request.getParameter("bname");
+System.out.println("cid");
+System.out.println(cid);
+
+ 	Class.forName("com.mysql.jdbc.Driver");
+	Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+
+    System.out.println(bname);
+int sta=0;
+  PreparedStatement st=con.prepareStatement("select * from customer where cid=? and bname=? ");
+  st.setString(1,id);
+	
+	st.setString(2,bname);
+		ResultSet rs=st.executeQuery();
+	if(rs.next()){
+	sta=rs.getInt(8);
+
+		session.setAttribute("bname",bname);
+			session.setAttribute("cid",id);
+response.sendRedirect("userhome.jsp");
+	
+}
+
+else{ PreparedStatement st5=con.prepareStatement("select * from creject where  cid=? and pwd=? and bname=? ");
+  st5.setString(1,cid);
+	st5.setString(2,pwd);
+	st5.setString(3,bname);
+	ResultSet rs5=st5.executeQuery();
+	if(rs5.next()){response.sendRedirect("accrej.jsp");}else{
+response.sendRedirect("noac.jsp");}
+}
+	%>
+<BR><BR><BR><BR><BR><center>
+<table width="50%" align="center" cellspacing="5">
+<tr>
+<td><a href="viewacinfo.jsp"><h2>View Accounts Information</a></td></tr><tr></tr><tr></tr>
+
+<tr><td><a href="samebanknewac.jsp"><h2>Create New Account</a></td></tr><tr></tr><tr></tr>
+<tr><td><a href="traamt.jsp"><h2>Transfer Amount</a></td>
+</tr><tr></tr><tr></tr><tr><td><a href="treport.jsp"><h2>Transaction Reports</a></td>
+</tr><tr></tr><tr></tr>
+<tr><td><a href="home.jsp"><h2>Signout</a></td>
+</tr><tr></tr><tr></tr>
+</table>
+</center>
+
+<center><BR><BR><BR><BR><BR><BR>
+<%@ page import="java.sql.*" %>
+<%String bname=(String)session.getAttribute("bname");
+
+
+String cid=(String)session.getAttribute("id");
+String pwd=(String)session.getAttribute("pwd");
+ 	Class.forName("com.mysql.jdbc.Driver");
+	Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/eti", "root", "root");
+	    System.out.println(cid);
+%><center><h2><u>Account Information</u><BR><BR>
+<table border="2" align="center" width="70%"><tr><td align="center"><h3>Customer Id</td><td align="center"><h3>Account Number</td><td align="center"><h3>Account Type</td><td align="center"><h3>Balance</td><td align="center"><h3>Status</td></tr>
+<%
+  PreparedStatement st=con.prepareStatement("select * from customer where bname=? and cid=?");
+	st.setString(1,bname);
+	st.setString(2,cid);
+	ResultSet rs=st.executeQuery();
+	while(rs.next()){
+	%><tr><td align="center"><%=rs.getString(1)%></td>
+		<td align="center"><%=rs.getString(4)%></td>
+		<td align="center"><%=rs.getString(5)%></td>
+		<td align="center"><%=rs.getString(8)%></td>
+		<%int sta=rs.getInt(10);
+		if(sta==1){%><td align="center">Created</td>
+			<%}else{%><td align="center">in process</td><%}%>
+		</tr>
+<%}%></center></table><center><BR><BR><BR>
+<input type="button" name=back  value="   BACK   " onClick="window.location='userhome.jsp'">
+
+
+</center>
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> New Document </TITLE>
+<META NAME="Generator" CONTENT="EditPlus">
+<META NAME="Author" CONTENT="">
+<META NAME="Keywords" CONTENT="">
+<META NAME="Description" CONTENT="">
+<frameset  rows="17%,83%" border="5" bordercolor="#BBDDFF">
+
+<frame name="header" src="header.jsp" noresize/>
+<frame name="body" src="body.jsp" noresize>
+
+ 
+</HEAD>
+
+<BODY>
+
+</BODY>
+</HTML>
+

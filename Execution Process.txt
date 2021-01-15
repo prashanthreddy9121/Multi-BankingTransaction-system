@@ -1,0 +1,26 @@
+
+NOTE-1: THIS  INSTALLATION  OF  NETBEANS-8.0.1-WINDOWS AND THE COMPONENTS REQUIRED FOR THE PROJECT EXECUTION TAKES LONGER TIME, MINIMUM
+TIME REQUIRED FOR THIS INSTALLATION IS ABOUT 1 HOURS. THE SUCCESSFUL INSTALLATION OF NETBEANS AND ALL THE REQUIRED COMPONENTS 
+WILL SOLELY DEPEND ON THE SYSTEM CONFIGURATIONS. 
+
+NOTE-2: SO, BEFORE INSTALLING NETBEANS-8.0.1-WINDOWS AND THIS PROJECT ON A SYSTEM, KINDLY VERIFY THE SYSTEM CONFIGURATIONS FOR INSTALLATION.
+
+
+Execution Steps to be followed for Executing the project:-
+
+1. Install mysql-5.5.29-win32 for Windows 32 bit into a location of choice.
+
+2. Then install the NETBEANS on the System by following the instructions given during the 
+	installation.
+
+3. After installing the NETBEANS, then copy and paste the project into the NETBEANS Projects directory (If NETBEANS
+	is installed in C:\Program files then NETBEANSProjects folder will be created by default in C:\users\userName\NETBEANSProjects).
+
+4. Now launch the NETBEANS and then a welcome window will be displayed there.
+
+5. Now click on the Open existing project and then go to the NETBEANSProjects folder and select the desired project.
+
+6. Connect mysql to Netbeans to access the database.
+
+7. Project will be opened and then click run to execute the project.
+
